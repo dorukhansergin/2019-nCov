@@ -1,0 +1,8 @@
+name: 2019-nCov
+dependencies:
+  - python=3.7
+  - pandas
+  - scipy
+  - numpy
+  - matplotlib
+  - bokeh
