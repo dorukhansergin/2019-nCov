@@ -84,35 +84,47 @@ class BasicEngine:
 
         for step in range(1, NumDays+1):
             # Compute Auxiliaries
-            A["TotalInfected"] = sum([S[key] for key in ["IA", "IPs", "ISHome", "ISHosp"]])
-            A["Exposed"] = S["S"] * A["TotalInfected"] * R0 / total_pop
-            A["Regular Bed"] = S["ISHosp"] * RBR
-            A["ICU"] = S["ISHosp"] * ICUR
-            A["Ventilator"] = S["ISHosp"] * (1 - RBR - ICUR)
+            A = self.compute_auxiliaries(A, ICUR, R0, RBR, S, total_pop)
 
             # Compute Flows
-            F["Becomes Naturally Immune"] = A["Exposed"] * SAR
-            F["Becomes Asymptomatic"] = A["Exposed"] * (1 - SAR) * InfAR
-            F["Becomes Presymptomatic"] = A["Exposed"] * (1 - SAR) * (1-InfAR)
-            F["Asymptomatic Recovers"] = S["IA"] / NDtRI
-            F["Symptomatic Recovers at Home"] = S["ISHome"] * (1 - DR) / NDtRI
-            F["Symptomatic Recovers at Hospital"] = S["ISHosp"] * (1 - DR) / NDtRI
-            F["Presymptomatic Stays Home to Recover"] = S["IPs"] * (1 - SCHR) / TtSO
-            F["Presymptomatic Becomes Hospitalized"] = S["IPs"] * SCHR / TtSO
-            F["Symptomatic Dies at Hospital"] = S["ISHosp"] * DR / NDtRI
-            F["Symptomatic Dies at Home"] = S["ISHome"] * DR / NDtRI
+            F = self.compute_flows(A, DR, F, InfAR, NDtRI, S, SAR, SCHR, TtSO)
 
             self.record_history(S, F, A)
 
             # Update Stocks
-            S["S"] = S["S"] - F["Becomes Naturally Immune"]  - F["Becomes Asymptomatic"] - F["Becomes Presymptomatic"]
-            S["NI"] = S["NI"] + F["Becomes Naturally Immune"]
-            S["IA"] = S["IA"] + F["Becomes Asymptomatic"] - F["Asymptomatic Recovers"]
-            S["IPs"] = S["IPs"] + F["Becomes Presymptomatic"] - F["Presymptomatic Stays Home to Recover"] - F["Presymptomatic Becomes Hospitalized"]
-            S["ISHome"] = S["ISHome"] + F["Presymptomatic Stays Home to Recover"] - F["Symptomatic Dies at Home"]
-            S["ISHosp"] = S["ISHosp"] + F["Presymptomatic Becomes Hospitalized"] - F["Symptomatic Dies at Hospital"]
-            S["R"] = S["R"] + F["Asymptomatic Recovers"] + F["Symptomatic Recovers at Home"] + F["Symptomatic Recovers at Hospital"]
-            S["D"] = S["D"] + F["Symptomatic Dies at Hospital"] + F["Symptomatic Dies at Home"]
+            S = self.update_stocks(F, S)
+
+    def update_stocks(self, F, S):
+        S["S"] = S["S"] - F["Becomes Naturally Immune"] - F["Becomes Asymptomatic"] - F["Becomes Presymptomatic"]
+        S["NI"] = S["NI"] + F["Becomes Naturally Immune"]
+        S["IA"] = S["IA"] + F["Becomes Asymptomatic"] - F["Asymptomatic Recovers"]
+        S["IPs"] = S["IPs"] + F["Becomes Presymptomatic"] - F["Presymptomatic Stays Home to Recover"] - F["Presymptomatic Becomes Hospitalized"]
+        S["ISHome"] = S["ISHome"] + F["Presymptomatic Stays Home to Recover"] - F["Symptomatic Dies at Home"]
+        S["ISHosp"] = S["ISHosp"] + F["Presymptomatic Becomes Hospitalized"] - F["Symptomatic Dies at Hospital"]
+        S["R"] = S["R"] + F["Asymptomatic Recovers"] + F["Symptomatic Recovers at Home"] + F["Symptomatic Recovers at Hospital"]
+        S["D"] = S["D"] + F["Symptomatic Dies at Hospital"] + F["Symptomatic Dies at Home"]
+        return S
+
+    def compute_flows(self, A, DR, F, InfAR, NDtRI, S, SAR, SCHR, TtSO):
+        F["Becomes Naturally Immune"] = A["Exposed"] * SAR
+        F["Becomes Asymptomatic"] = A["Exposed"] * (1 - SAR) * InfAR
+        F["Becomes Presymptomatic"] = A["Exposed"] * (1 - SAR) * (1 - InfAR)
+        F["Asymptomatic Recovers"] = S["IA"] / NDtRI
+        F["Symptomatic Recovers at Home"] = S["ISHome"] * (1 - DR) / NDtRI
+        F["Symptomatic Recovers at Hospital"] = S["ISHosp"] * (1 - DR) / NDtRI
+        F["Presymptomatic Stays Home to Recover"] = S["IPs"] * (1 - SCHR) / TtSO
+        F["Presymptomatic Becomes Hospitalized"] = S["IPs"] * SCHR / TtSO
+        F["Symptomatic Dies at Hospital"] = S["ISHosp"] * DR / NDtRI
+        F["Symptomatic Dies at Home"] = S["ISHome"] * DR / NDtRI
+        return F
+
+    def compute_auxiliaries(self, A, ICUR, R0, RBR, S, total_pop):
+        A["TotalInfected"] = sum([S[key] for key in ["IA", "IPs", "ISHome", "ISHosp"]])
+        A["Exposed"] = S["S"] * A["TotalInfected"] * R0 / total_pop
+        A["Regular Bed"] = S["ISHosp"] * RBR
+        A["ICU"] = S["ISHosp"] * ICUR
+        A["Ventilator"] = S["ISHosp"] * (1 - RBR - ICUR)
+        return A
 
     def record_history(self, S, F, A):
         for key, value in chain(S.items(), F.items(), A.items()):
