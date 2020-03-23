@@ -23,7 +23,7 @@ spread_factors_control_panel_ui_params = {
     "SCHR": {"widget": Slider, "kwargs": {"start": 1, "end": 100, "value": 33, "step": 1, "title": "Symp Case Hosp Rate(%)"}, "type": int},
     "DR": {"widget": Slider, "kwargs": {"start": 1, "end": 100, "value": 2, "step": 1, "title": "Death Rate(%)"}, "type": int},
     "NDtRI": {"widget": Slider, "kwargs": {"start": 1, "end": 20, "value": 14, "step": 1, "title": "Time to Resolve Symptoms(days)"}, "type": int},
-    "RBR": {"widget": Slider, "kwargs": {"start": 1, "end": 100, "value": 35, "step": 1, "title": "ICU Ratio(%)"}, "type": int},
+    "RBR": {"widget": Slider, "kwargs": {"start": 1, "end": 100, "value": 35, "step": 1, "title": "Regular Bed Ratio(%)"}, "type": int},
     "ICUR": {"widget": Slider, "kwargs": {"start": 1, "end": 100, "value": 20, "step": 1, "title": "ICU Ratio(%)"}, "type": int},
     "NumDays": {"widget": Slider, "kwargs": {"start": 1, "end": 300, "value": 200, "step": 10, "title": "Simulation Steps(days)"}, "type": int}
 }
