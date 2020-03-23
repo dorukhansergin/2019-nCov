@@ -31,21 +31,20 @@ def run_and_plot(event):
 
 
 # Create plots and widgets
-heading = Div(text="""<h1>ASU 2019-nCov Demo</h1><p>Lorem ipsum dolor amet</p><hr>""", height=150,
-              sizing_mode="stretch_width")
+heading = Div(text="""<h1>ASU 2019-nCov Demo</h1><p>Lorem ipsum dolor amet</p><hr>""", height=150, id="main-header", sizing_mode="stretch_width")
 model_menu = list(MODELS.keys())
-model_select = Select(title="Select Model", value=model_menu[0], options=model_menu)
-run_button = Button(label="Run", button_type="success")
+model_select = Select(title="Select Model", value=model_menu[0], options=model_menu, id="model-select")
+run_button = Button(label="Run", button_type="success", id="run-button")
 
 # Add callbacks
 model_select.on_change("value", update_control_widget_by_model)
 run_button.on_click(run_and_plot)
 
 # Arrange plots and widgets in layouts
-fixed_control_panel = row(model_select, run_button)
+fixed_control_panel = row(model_select, run_button, id="fixed-control-panel")
 dynamic_widgets = MODELS[model_menu[0]]().dynamic_control_panel()
-control_panel = column(*(fixed_control_panel, dynamic_widgets), sizing_mode="fixed", height=250, width=700)
-plot_panel = column(*(figure(title=""),), sizing_mode="scale_width")
+control_panel = column(*(fixed_control_panel, dynamic_widgets), sizing_mode="fixed", height=250, width=700, id="control-panel")
+plot_panel = column(*(figure(title=""),), sizing_mode="scale_width", id="plot-panel")
 
 l = layout([
     [heading],

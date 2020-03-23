@@ -45,7 +45,7 @@ class BasicModel(BaseModel):
             new_ui_item = ui_item["widget"](id=id, **ui_item["kwargs"])
             spread_factors_panel.children.append(new_ui_item)
 
-        return row(*(pop_control_panel, spread_factors_panel))
+        return row(*(pop_control_panel, spread_factors_panel), id="dynamic-control-panel")
 
     def run_with_the_input_from_control_panel(self, control_panel):
         self.engine = BasicEngine()
@@ -59,7 +59,6 @@ class BasicModel(BaseModel):
 
     def plot_panel(self):
         p = figure(title="Population Levels Per Day")
-        print(self.engine.history["S"])
         p.line(range(len(self.engine.history["S"])), self.engine.history["S"], line_color="tomato", legend_label="Susceptible")
         p.line(range(len(self.engine.history["IA"])), self.engine.history["IA"], line_color="blue", legend_label="Infected-Asymptomatic")
         model_diagram = Div(text="""<iframe allowfullscreen style="width:960px; height:720px" src="https://www.lucidchart.com/documents/embeddedchart/6bc70cef-a783-49d3-877c-c271c78ed2c4" id="eBWIQhS5aeGB"></iframe>""")
@@ -85,12 +84,10 @@ class BasicEngine:
         for step in range(1, NumDays+1):
             # Compute Auxiliaries
             A = self.compute_auxiliaries(A, ICUR, R0, RBR, S, total_pop)
-
             # Compute Flows
             F = self.compute_flows(A, DR, F, InfAR, NDtRI, S, SAR, SCHR, TtSO)
-
+            # Record History of Each Stock, Flow and Auxiliary Variable
             self.record_history(S, F, A)
-
             # Update Stocks
             S = self.update_stocks(F, S)
 
