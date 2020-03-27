@@ -3,9 +3,8 @@ from bokeh.layouts import layout, column
 from bokeh.models import Select, Div, Button
 from bokeh.plotting import figure
 
-from helpers import refresh_layout
-from models.quarantine_two import QuarantineTwo
-import pandas as pd
+from .helpers import refresh_layout
+from .models.quarantine_two import QuarantineTwo
 
 MODELS = {"Quarantine #2": QuarantineTwo}
 model_menu = list(MODELS.keys())
